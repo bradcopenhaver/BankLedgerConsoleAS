@@ -109,28 +109,9 @@ namespace BankLedgerConsole
                 return string.Format("{0} is not a valid account number. Login aborted.", acctNumInput);
             }
 
-            Console.Write("Password: ");
-            string pswdInput = Console.ReadLine();
-
-            //Validate password
+            //Retrieve account and login
             Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == acctNum);
-            if(pswdInput != currentAcct.Password)
-            {
-                return string.Format("Incorrect password for account number {0}.", acctNum);
-            }
-
-            //Set authentication status
-            Ledger.Authenticated = true;
-            Ledger.CurrentAcctNum = acctNum;
-
-            //Enable and disable appropriate commands
-            Ledger.Commands[1].Available = false;
-            Ledger.Commands[2].Available = false;
-            Ledger.Commands[3].Available = true;
-            Ledger.Commands[4].Available = true;
-            Ledger.Commands[5].Available = true;
-            Ledger.Commands[6].Available = true;
-            Ledger.Commands[7].Available = true;
+            currentAcct.Login();            
 
             return Status();
         }
@@ -145,18 +126,9 @@ namespace BankLedgerConsole
                 return string.Format("{0} is not an available command.", Commands[7].Name);
             }
 
-            //Set authentication status
-            Ledger.Authenticated = false;
-            Ledger.CurrentAcctNum = 0;
-
-            //Enable and disable appropriate commands
-            Ledger.Commands[1].Available = true;
-            Ledger.Commands[2].Available = true;
-            Ledger.Commands[3].Available = false;
-            Ledger.Commands[4].Available = false;
-            Ledger.Commands[5].Available = false;
-            Ledger.Commands[6].Available = false;
-            Ledger.Commands[7].Available = false;
+            //Retrieve account and login
+            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
+            currentAcct.Logout();
 
             return Status();
         }

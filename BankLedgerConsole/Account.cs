@@ -26,5 +26,48 @@ namespace BankLedgerConsole
         {
             Balance = Balance - withdrawAmt;
         }
+
+        public void Login()
+        {
+            Console.Write("Password: ");
+            string pswdInput = Console.ReadLine();
+
+            //Validate password
+            if (pswdInput != Password)
+            {
+                Console.WriteLine(string.Format("Incorrect password for account number {0}.", AcctNumber));
+            }
+            else
+            {
+                //Set authentication status
+                Ledger.Authenticated = true;
+                Ledger.CurrentAcctNum = AcctNumber;
+
+                //Enable and disable appropriate commands
+                Ledger.Commands[1].Available = false;
+                Ledger.Commands[2].Available = false;
+                Ledger.Commands[3].Available = true;
+                Ledger.Commands[4].Available = true;
+                Ledger.Commands[5].Available = true;
+                Ledger.Commands[6].Available = true;
+                Ledger.Commands[7].Available = true;
+            }            
+        }
+
+        public void Logout()
+        {
+            //Set authentication status
+            Ledger.Authenticated = false;
+            Ledger.CurrentAcctNum = 0;
+
+            //Enable and disable appropriate commands
+            Ledger.Commands[1].Available = true;
+            Ledger.Commands[2].Available = true;
+            Ledger.Commands[3].Available = false;
+            Ledger.Commands[4].Available = false;
+            Ledger.Commands[5].Available = false;
+            Ledger.Commands[6].Available = false;
+            Ledger.Commands[7].Available = false;
+        }
     }
 }
