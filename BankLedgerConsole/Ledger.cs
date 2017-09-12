@@ -46,9 +46,11 @@ namespace BankLedgerConsole
 
         public static string Status()
         {
+            //Check login status
             string authenticated = Authenticated ? "" : "not ";
             string account = Authenticated ? " to account number " + CurrentAcctNum.ToString() : "";
 
+            //Create list of available commands
             List<Command> availableCommands = Commands.FindAll(x => x.Available == true);
             string availableCommandsString = "Available commands:";
             for (int i = 0; i < availableCommands.Count; i++)
@@ -61,7 +63,16 @@ namespace BankLedgerConsole
 
         public static string CreateAccount()
         {
+            //Check command availability
+            if(!Commands[1].Available)
+            {
+                return string.Format("{0} is not an available command.", Commands[1].Name);
+            }
+
+            //Set account number
             int newAcctNum = Ledger.Accounts.Count + 1;
+
+            //Input password
             Console.WriteLine(string.Format("Creating account {0}. Enter a password for this account.", newAcctNum));
             string newAcctPswd = Console.ReadLine();
 
@@ -70,6 +81,84 @@ namespace BankLedgerConsole
             Ledger.Commands[2].Available = true;
 
             return string.Format("Your account number is: {0}. Log in with your password to make an initial deposit.", newAcctNum);
+        }
+
+        public static string Login()
+        {
+            //Check command availability
+            if (!Commands[2].Available)
+            {
+                return string.Format("{0} is not an available command.", Commands[2].Name);
+            }
+
+            Console.Write("Account number: ");
+            string acctNumInput = Console.ReadLine();
+
+            //Validate account number input
+            try
+            {
+                int acctNumTry = Int32.Parse(acctNumInput);
+            }
+            catch
+            {
+                return string.Format("{0} is not a valid account number. Login aborted.", acctNumInput);
+            }
+            int acctNum = Int32.Parse(acctNumInput);
+            if(acctNum < 1 || acctNum > Ledger.Accounts.Count)
+            {
+                return string.Format("{0} is not a valid account number. Login aborted.", acctNumInput);
+            }
+
+            Console.Write("Password: ");
+            string pswdInput = Console.ReadLine();
+
+            //Validate password
+            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == acctNum);
+            if(pswdInput != currentAcct.Password)
+            {
+                return string.Format("Incorrect password for account number {0}.", acctNum);
+            }
+
+            //Set authentication status
+            Ledger.Authenticated = true;
+            Ledger.CurrentAcctNum = acctNum;
+
+            //Enable and disable appropriate commands
+            Ledger.Commands[1].Available = false;
+            Ledger.Commands[2].Available = false;
+            Ledger.Commands[3].Available = true;
+            Ledger.Commands[4].Available = true;
+            Ledger.Commands[5].Available = true;
+            Ledger.Commands[6].Available = true;
+            Ledger.Commands[7].Available = true;
+
+            return Status();
+        }
+
+
+
+        public static string Logout()
+        {
+            //Check command availability
+            if (!Commands[7].Available)
+            {
+                return string.Format("{0} is not an available command.", Commands[7].Name);
+            }
+
+            //Set authentication status
+            Ledger.Authenticated = false;
+            Ledger.CurrentAcctNum = 0;
+
+            //Enable and disable appropriate commands
+            Ledger.Commands[1].Available = true;
+            Ledger.Commands[2].Available = true;
+            Ledger.Commands[3].Available = false;
+            Ledger.Commands[4].Available = false;
+            Ledger.Commands[5].Available = false;
+            Ledger.Commands[6].Available = false;
+            Ledger.Commands[7].Available = false;
+
+            return Status();
         }
     }
 }

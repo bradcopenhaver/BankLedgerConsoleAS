@@ -51,6 +51,12 @@ namespace BankLedgerConsole
                 case "Create new account":
                     return Ledger.CreateAccount();
 
+                case "Login":
+                    return Ledger.Login();
+
+                case "Logout":
+                    return Ledger.Logout();
+
                 default:
                     return string.Format("{0} is not a valid command.", command);
             }
