@@ -35,7 +35,7 @@ namespace BankLedgerConsole
             {
                 new Command("Status", true),
                 new Command("Create new account", true),
-                new Command("Login", false),
+                new Command("Log in", false),
                 new Command("Deposit", false),
                 new Command("Withdraw", false),
                 new Command("Check balance", false),
@@ -83,7 +83,7 @@ namespace BankLedgerConsole
             return string.Format("Your account number is: {0}. Log in with your password to make an initial deposit.", newAcctNum);
         }
 
-        public static string Login()
+        public static string LogIn()
         {
             //Check command availability
             if (!Commands[2].Available)
@@ -116,9 +116,71 @@ namespace BankLedgerConsole
             return Status();
         }
 
+        public static string Deposit()
+        {
+            //Check command availability
+            if (!Commands[3].Available)
+            {
+                return string.Format("{0} is not an available command.", Commands[3].Name);
+            }
 
+            Console.Write("Amount to deposit: ");
+            string inputAmount = Console.ReadLine();
 
-        public static string Logout()
+            //Validate input
+            try
+            {
+                double depAmtTry = double.Parse(inputAmount, System.Globalization.NumberStyles.Currency);
+            }
+            catch
+            {
+                return string.Format("{0} is not a valid deposit amount. Please submit the amount in dollars (d) and cents (c) in the format 'ddd.cc'", inputAmount);
+            }
+            double depAmt = double.Parse(inputAmount, System.Globalization.NumberStyles.Currency);
+            if(depAmt <= 0) return string.Format("{0} is not a valid deposit amount. Deposits must be greater than zero", inputAmount);
+
+            //Retrieve account and apply deposit.
+            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);            
+            currentAcct.Deposit(depAmt);
+
+            return Status();
+        }
+
+        public static string Withdraw()
+        {
+            //Check command availability
+            if (!Commands[4].Available)
+            {
+                return string.Format("{0} is not an available command.", Commands[4].Name);
+            }
+
+            Console.Write("Amount to withdraw: ");
+            string inputAmount = Console.ReadLine();
+
+            //Retrieve account 
+            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
+
+            //Validate input
+            try
+            {
+                double wdAmtTry = double.Parse(inputAmount, System.Globalization.NumberStyles.Currency);                
+                
+            }
+            catch
+            {
+                return string.Format("{0} is not a valid withdraw amount. Please submit the amount in dollars (d) and cents (c) in the format 'ddd.cc'", inputAmount);
+            }
+            double wdAmt = double.Parse(inputAmount, System.Globalization.NumberStyles.Currency);
+            if (wdAmt < 0) return string.Format("{0} is not a valid withdraw amount. Withdraws must be greater than zero.", inputAmount);
+            if (wdAmt > currentAcct.Balance) return string.Format("{0} is not a valid withdraw amount. The amount exceeds the current account balance.", inputAmount);
+            
+            //Apply withdraw
+            currentAcct.Withdraw(wdAmt);
+
+            return Status();
+        }
+
+        public static string LogOut()
         {
             //Check command availability
             if (!Commands[7].Available)
@@ -126,7 +188,7 @@ namespace BankLedgerConsole
                 return string.Format("{0} is not an available command.", Commands[7].Name);
             }
 
-            //Retrieve account and login
+            //Retrieve account and logouts
             Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
             currentAcct.Logout();
 

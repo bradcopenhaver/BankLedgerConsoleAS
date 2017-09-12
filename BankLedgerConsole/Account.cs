@@ -17,12 +17,12 @@ namespace BankLedgerConsole
             Balance = 0d;
         }
 
-        public void Deposit(float depositAmt)
+        public void Deposit(double depositAmt)
         {
             Balance = Balance + depositAmt;
         }
 
-        public void Withdraw(float withdrawAmt)
+        public void Withdraw(double withdrawAmt)
         {
             Balance = Balance - withdrawAmt;
         }
