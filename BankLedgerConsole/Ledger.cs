@@ -22,11 +22,9 @@ namespace BankLedgerConsole
                 new Command("Status", true),
                 new Command("Create new account", true),
                 new Command("Log in", false),
-                new Command("Deposit", false),
-                new Command("Withdraw", false),
+                new Command("Log out", false),
                 new Command("Check balance", false),
-                new Command("Transaction history", false),
-                new Command("Log out", false)
+                new Command("Transaction history", false)
             };
         }
 
@@ -38,6 +36,11 @@ namespace BankLedgerConsole
 
             //Create list of available commands
             List<Command> availableCommands = Commands.FindAll(x => x.Available == true);
+            if (Authenticated)
+            {
+                Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
+                availableCommands.AddRange(currentAcct.Commands.FindAll(x => x.Available == true));
+            }
             string availableCommandsString = "Available commands:";
             for (int i = 0; i < availableCommands.Count; i++)
             {
@@ -95,17 +98,40 @@ namespace BankLedgerConsole
                 return string.Format("{0} is not a valid account number. Login aborted.", acctNumInput);
             }
 
-            //Retrieve account and login
-            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == acctNum);
-            currentAcct.Login();            
+            //Retrieve account password and login
+            String currentAcctPswd = Ledger.Accounts.Find(x => x.AcctNumber == acctNum).Password;
+            Console.Write("Password: ");
+            string pswdInput = Console.ReadLine();
+
+            //Validate password
+            if (pswdInput != currentAcctPswd)
+            {
+                Console.WriteLine(string.Format("Incorrect password for account number {0}.", acctNum));
+            }
+            else
+            {
+                //Set authentication status
+                Ledger.Authenticated = true;
+                Ledger.CurrentAcctNum = acctNum;
+
+                //Enable and disable appropriate commands
+                Ledger.Commands[1].Available = false;
+                Ledger.Commands[2].Available = false;
+                Ledger.Commands[3].Available = true;
+                Ledger.Commands[4].Available = true;
+                Ledger.Commands[5].Available = true;
+            }
 
             return Status();
         }
 
         public static string Deposit()
         {
+            //Retrieve account
+            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
+
             //Check command availability
-            if (!Commands[3].Available)
+            if (!Authenticated || !currentAcct.Commands[0].Available)
             {
                 return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[3].Name);
             }
@@ -125,8 +151,7 @@ namespace BankLedgerConsole
             double depAmt = double.Parse(inputAmount, System.Globalization.NumberStyles.Currency);
             if(depAmt <= 0) return string.Format("{0} is not a valid deposit amount. Deposits must be greater than zero", inputAmount);
 
-            //Retrieve account and apply deposit.
-            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);            
+            //Apply deposit.
             currentAcct.Deposit(depAmt);
 
             return CheckBalance();
@@ -134,8 +159,11 @@ namespace BankLedgerConsole
 
         public static string Withdraw()
         {
+            //Retrieve account 
+            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
+
             //Check command availability
-            if (!Commands[4].Available)
+            if (!Authenticated || !currentAcct.Commands[1].Available)
             {
                 return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[4].Name);
             }
@@ -143,9 +171,7 @@ namespace BankLedgerConsole
             Console.Write("Amount to withdraw: ");
             string inputAmount = Console.ReadLine();
 
-            //Retrieve account 
-            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
-
+            
             //Validate input
             try
             {
@@ -167,24 +193,25 @@ namespace BankLedgerConsole
 
         public static string CheckBalance()
         {
-            //Check command availability
-            if (!Commands[5].Available)
-            {
-                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[5].Name);
-            }
-
             //Retrieve account 
             Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
 
+            //Check command availability
+            if (!Commands[4].Available)
+            {
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[4].Name);
+            }
+
+            
             return string.Format("Account {0} current balance: {1}", currentAcct.AcctNumber, currentAcct.Balance);
         }
 
         public static string TransactionHistory()
         {
             //Check command availability
-            if (!Commands[6].Available)
+            if (!Commands[5].Available)
             {
-                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[6].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[5].Name);
             }
 
             //Compile relevant transactions
@@ -204,14 +231,21 @@ namespace BankLedgerConsole
         public static string LogOut()
         {
             //Check command availability
-            if (!Commands[7].Available)
+            if (!Commands[3].Available)
             {
-                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[7].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[3].Name);
             }
+            
+            //Set authentication status
+            Ledger.Authenticated = false;
+            Ledger.CurrentAcctNum = 0;
 
-            //Retrieve account and logouts
-            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
-            currentAcct.Logout();
+            //Enable and disable appropriate commands
+            Ledger.Commands[1].Available = true;
+            Ledger.Commands[2].Available = true;
+            Ledger.Commands[3].Available = false;
+            Ledger.Commands[4].Available = false;
+            Ledger.Commands[5].Available = false;
 
             return Status();
         }
