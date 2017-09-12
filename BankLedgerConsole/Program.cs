@@ -12,6 +12,8 @@ namespace BankLedgerConsole
             // Instantiate Ledger
             Ledger ledger = new Ledger();
 
+            //Welcome message
+            Console.WriteLine("Welcome to Best Bank Ledger console edition. Enter command |Status| at any time to see available commands.");
             Run();
         }
 
@@ -20,6 +22,7 @@ namespace BankLedgerConsole
         {
             while (true)
             {
+                //Gather input
                 var consoleInput = ReadFromConsole();
                 if (string.IsNullOrWhiteSpace(consoleInput)) continue;
 
@@ -70,7 +73,7 @@ namespace BankLedgerConsole
                     return Ledger.TransactionHistory();
 
                 default:
-                    return string.Format("{0} is not a valid command.", command);
+                    return string.Format("{0} is not a valid command. Enter |Status| to see available commands.", command);
             }
             
         }
@@ -85,7 +88,7 @@ namespace BankLedgerConsole
         }
 
 
-        const string _readPrompt = "console> ";
+        const string _readPrompt = "Ledger> ";
         public static string ReadFromConsole(string promptMessage = "")
         {
             // Show a prompt, and get input:

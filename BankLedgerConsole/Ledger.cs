@@ -10,27 +10,13 @@ namespace BankLedgerConsole
         public static List<Transaction> Transactions { get; set; }
         public static bool Authenticated { get; set; }
         public static int CurrentAcctNum { get; set; }
-        public string[] Messages { get; set; }
-        public static int MessageIndex { get; set; }
         public static List<Command> Commands { get; set; }
 
         public Ledger()
         {
             Accounts = new List<Account> { };
             Transactions = new List<Transaction> { };
-            Authenticated = false;
-            Messages = new string[]
-            {
-                "",
-                "No accounts in ledger. Please create a new account.",
-                "Account created. Log in to make an initial deposit.",
-                "Passwords do not match. Try again.",
-                "Incorrect password.",
-                "That account number does not exist.",
-                "You are not logged in to the account you tried to access.",
-                "You have logged out."
-            };
-            MessageIndex = 1;
+            Authenticated = false;            
             Commands = new List<Command>
             {
                 new Command("Status", true),
@@ -66,7 +52,7 @@ namespace BankLedgerConsole
             //Check command availability
             if(!Commands[1].Available)
             {
-                return string.Format("{0} is not an available command.", Commands[1].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[1].Name);
             }
 
             //Set account number
@@ -88,7 +74,7 @@ namespace BankLedgerConsole
             //Check command availability
             if (!Commands[2].Available)
             {
-                return string.Format("{0} is not an available command.", Commands[2].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[2].Name);
             }
 
             Console.Write("Account number: ");
@@ -121,7 +107,7 @@ namespace BankLedgerConsole
             //Check command availability
             if (!Commands[3].Available)
             {
-                return string.Format("{0} is not an available command.", Commands[3].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[3].Name);
             }
 
             Console.Write("Amount to deposit: ");
@@ -151,7 +137,7 @@ namespace BankLedgerConsole
             //Check command availability
             if (!Commands[4].Available)
             {
-                return string.Format("{0} is not an available command.", Commands[4].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[4].Name);
             }
 
             Console.Write("Amount to withdraw: ");
@@ -184,7 +170,7 @@ namespace BankLedgerConsole
             //Check command availability
             if (!Commands[5].Available)
             {
-                return string.Format("{0} is not an available command.", Commands[5].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[5].Name);
             }
 
             //Retrieve account 
@@ -198,7 +184,7 @@ namespace BankLedgerConsole
             //Check command availability
             if (!Commands[6].Available)
             {
-                return string.Format("{0} is not an available command.", Commands[6].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[6].Name);
             }
 
             //Compile relevant transactions
@@ -220,7 +206,7 @@ namespace BankLedgerConsole
             //Check command availability
             if (!Commands[7].Available)
             {
-                return string.Format("{0} is not an available command.", Commands[7].Name);
+                return string.Format("{0} is not an available command. Enter |Status| to see available commands.", Commands[7].Name);
             }
 
             //Retrieve account and logouts
