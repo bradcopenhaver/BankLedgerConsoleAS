@@ -63,6 +63,12 @@ namespace BankLedgerConsole
                 case "Withdraw":
                     return Ledger.Withdraw();
 
+                case "Check balance":
+                    return Ledger.CheckBalance();
+
+                case "Transaction history":
+                    return Ledger.TransactionHistory();
+
                 default:
                     return string.Format("{0} is not a valid command.", command);
             }

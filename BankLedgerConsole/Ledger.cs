@@ -143,7 +143,7 @@ namespace BankLedgerConsole
             Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);            
             currentAcct.Deposit(depAmt);
 
-            return Status();
+            return CheckBalance();
         }
 
         public static string Withdraw()
@@ -164,7 +164,6 @@ namespace BankLedgerConsole
             try
             {
                 double wdAmtTry = double.Parse(inputAmount, System.Globalization.NumberStyles.Currency);                
-                
             }
             catch
             {
@@ -177,7 +176,43 @@ namespace BankLedgerConsole
             //Apply withdraw
             currentAcct.Withdraw(wdAmt);
 
-            return Status();
+            return CheckBalance();
+        }
+
+        public static string CheckBalance()
+        {
+            //Check command availability
+            if (!Commands[5].Available)
+            {
+                return string.Format("{0} is not an available command.", Commands[5].Name);
+            }
+
+            //Retrieve account 
+            Account currentAcct = Ledger.Accounts.Find(x => x.AcctNumber == Ledger.CurrentAcctNum);
+
+            return string.Format("Account {0} current balance: {1}", currentAcct.AcctNumber, currentAcct.Balance);
+        }
+
+        public static string TransactionHistory()
+        {
+            //Check command availability
+            if (!Commands[6].Available)
+            {
+                return string.Format("{0} is not an available command.", Commands[6].Name);
+            }
+
+            //Compile relevant transactions
+            List<Transaction> relevantTransactions = Ledger.Transactions.FindAll(x => x.AccountNumber == Ledger.CurrentAcctNum);
+
+            //Display list
+            for(int i=0; i<relevantTransactions.Count; i++)
+            {
+                string transactionType = "Deposit";
+                if (relevantTransactions[i].StartingBalance > relevantTransactions[i].EndingBalance) transactionType = "Withdraw";
+                Console.WriteLine(string.Format("{0}: |{1}| Initial balance {2} ; Ending balance {3}", relevantTransactions[i].TimeOfTransaction, transactionType, relevantTransactions[i].StartingBalance, relevantTransactions[i].EndingBalance));
+            }
+
+            return "------End of list------";
         }
 
         public static string LogOut()

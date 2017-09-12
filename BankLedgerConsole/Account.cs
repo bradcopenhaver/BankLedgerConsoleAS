@@ -19,12 +19,22 @@ namespace BankLedgerConsole
 
         public void Deposit(double depositAmt)
         {
+            double initialBal = Balance;
             Balance = Balance + depositAmt;
+            double endingBal = Balance;
+
+            //Log transaction
+            Ledger.Transactions.Add(new Transaction(AcctNumber, initialBal, endingBal));
         }
 
         public void Withdraw(double withdrawAmt)
         {
+            double initialBal = Balance;
             Balance = Balance - withdrawAmt;
+            double endingBal = Balance;
+
+            //Log transaction
+            Ledger.Transactions.Add(new Transaction(AcctNumber, initialBal, endingBal));
         }
 
         public void Login()
